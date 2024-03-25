@@ -1,21 +1,87 @@
-c++ crypto viper
-## C++ Encryption/Decryption/Hashing Lazy Job Done
 
-> The main.cpp source file, serves only to the purpose of showing how to interact with Viper(the useless abstraction Blaster).
-> The library resides in the lib folder named "viper.hpp", you need to include that translation unit in order to execute such functions.
+# Crypto Viper c++ Crypto Blaster
 
-## What is About
-> this is just an abstracted version of the Crypto++ library in c++, the program(Viper) takes the original library(crypto++) and hides all the details often not important to the programmer, such as generating key/iv blocks.
-> This Library is light weight, so it is pretty small in size, actually the only operations allowed are:
+A simple light-weight crypto library written in c++ for c++.
+
+## Description
+
+> this library allows you to easily integrate encryption, decryption, hashing and SHA[x] Reverse(Crack) Ciphers.
+Implementation resides within a light-weight class named Viper(here the repository name), to work with any of the above functionalities a Viper instance must be created.
+
+## Compatibility
+
+> I built and compiled this program on Linux Mint OS, IDK if it will work on Windows and Mac OS as well, some of the dependencies may not work on other platforms...
+
+
+## Dependencies
+* Crypto++
+* Standard C++ Libraries
+
+## Memory Safety
+> The library is pretty safe by itself, been tested and compiled using g++ address-sanitizer flag, no memory leaks have been reported so far, you can try to compile the library again within your local environment, and see for yourself, you can re-compile using "compile.sh" shell script located in the root directory of the project.
+
+## Namespace
+* ViperCipher
+
+## Macros
+* none
+
+## Class
+* Viper
+
+## Structures
+* BlockStructure
+* CrackedCipherStructure
+* ShaModeStructure
+
+## Enumerations
+* RSA_KEY_FLAG
+* RSA_KEY_FILE
+* SHA_BLOCK_SIZE
+
+## Methods
+
+### Public      
+
+* Constructor(Viper)
 * Hash
 * Encrypt
 * Decrypt
+* GenRsaPublicKey
+* GenRsaPrivateKey
+* GetPublicKey
+* GetPrivateKey
+* RevokeKeyIv
+* CipherAttack
+* CipherAttackDetached
+* ThreadWait
+* Destructor(~Viper)
 
-> If you edit the viper.hpp translation unit, then you need to re-compile the main.cpp source file in order to re-assert the unit test using the main entry point, otherwise no changes will take place.
-> If you don't care about the unit test within the main source file, then NO need for re-compilation.
+### Private
 
-### For Installing g++ compiler on Linux OS you can run: 
+* FileCollect
 
-> $ sudo apt install g++ 
+## Static
+* none
 
-### Then to check the version and installation state run:
+## Virtual
+* none
+
+## Properties
+
+### Public
+
+* Blocks
+* CrackRegister
+* SystemEntropy
+* use_key
+* use_iv
+* sha_mode
+* is_cracker_running
+* crack_deck
+* cipher_crack_entries
+
+### Static
+* none
+
+  
