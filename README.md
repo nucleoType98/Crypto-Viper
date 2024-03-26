@@ -60,9 +60,9 @@ int main(int argc, char **argv) {
 
 ```
 
-### Specify Hash Algorithm
+### Specify Hash Algorithm Flag
 
-Available Options:
+Available Flags:
 
 * SHA_BLOCK_SIZE::SHA1
 * SHA_BLOCK_SIZE::SHA224
@@ -162,9 +162,15 @@ int main(int argc, char **argv) {
 
 ```
 
-### Gen RSA Private/Public Key and Store them File
+### Gen RSA Private/Public Key and Store into File/s
 
 > Provide a path for the file to store key into as first argument, as second argument a Flag describing the destination store type, The default behavior(RSA_KEY_FLAG::SCRIPT_COLLECTOR) is to store the key locally within the code, to store a key within a file RSA_KEY_FLAG::FILE_COLLECTOR Flag is required
+
+Available Flags
+
+* RSA_KEY_FLAG::SCRIPT_COLLECTOR -- no file will be written to
+* RSA_KEY_FLAG::FILE_COLLECTOR   -- a file will be used to store the key
+* RSA_KEY_FLAG::DEFAULT          -- defaults to SCRIPT_COLLECTOR
 
 ```cpp
 #include <iostream>
@@ -222,7 +228,8 @@ int main(int argc, char **argv) {
 
 ### Hash Cipher Attack
 
-> Crack some hashed entries.
+> Crack hash computed values, this function uses a table of records(human readable words) to crack a list of hashed values you provide as argument, the list must contain a valid set of hash-[Algo] records in order to de-cipher, if any of the records are corrupted or altered, the attack fails, you can provide how many records you need within the list, but the file of records to be scanned must contain at least 1 entry.
+> You need to specify an algorithm as well for the attack, such as SHA1, SHA256, etc... and finally provide the loop execution speed used to suspand the operation for an X mcs in order to allow proper operation output. 
 
 ```cpp
 #include <iostream>
