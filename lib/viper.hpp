@@ -34,17 +34,13 @@
 using namespace CryptoPP;
 
 namespace ViperCipher
-{
+{ 
 
 std::mutex gMutex;
 
 #define __BUFFER_MAX_SIZE__ (unsigned int)4096u
 
-class Viper
-{
-
-  public:
-    typedef struct alignas(void *)
+ typedef struct alignas(void *)
     {
         std::basic_string<char> plain;
         std::basic_string<char> hashed;
@@ -91,6 +87,8 @@ class Viper
         SHA512 = 512
     };
 
+class Viper
+{   
   private:
     BlockStructure Blocks;
     std::vector<CrackedCipherStructure> CrackRegister;
@@ -214,7 +212,7 @@ class Viper
      * @param const RSA_KEY_FLAG& - a flag indicating if key is supposed to be saved to a file named "KeyFileName" or not
      * @returns this
      */
-    ViperCipher::Viper &GenRsaPublicKey(const std::basic_string_view<char> &KeyFileName = "", const Viper::RSA_KEY_FLAG &Flag = Viper::RSA_KEY_FLAG::SCRIPT_COLLECTOR) noexcept
+    ViperCipher::Viper &GenRsaPublicKey(const std::basic_string_view<char> &KeyFileName = "", const ViperCipher::RSA_KEY_FLAG &Flag = ViperCipher::RSA_KEY_FLAG::SCRIPT_COLLECTOR) noexcept
     {
         try
         {
@@ -254,7 +252,7 @@ class Viper
      * @param const RSA_KEY_FLAG& - a flag indicating if key is supposed to be saved to a file named "KeyFileName" or not
      * @returns this
      */
-    ViperCipher::Viper &GenRsaPrivateKey(const std::basic_string_view<char> &KeyFileName = "", const Viper::RSA_KEY_FLAG &Flag = Viper::RSA_KEY_FLAG::SCRIPT_COLLECTOR) noexcept
+    ViperCipher::Viper &GenRsaPrivateKey(const std::basic_string_view<char> &KeyFileName = "", const ViperCipher::RSA_KEY_FLAG &Flag = ViperCipher::RSA_KEY_FLAG::SCRIPT_COLLECTOR) noexcept
     {
         try
         {
@@ -338,7 +336,6 @@ class Viper
                     std::cout << collect << std::flush;
                     attack_list.push_back(collect);
                     std::cout << std::endl;
-                    std::this_thread::sleep_for(std::chrono::microseconds(1000));
                 }
             }
 
@@ -445,7 +442,7 @@ class Viper
     const void FileCollect(const std::basic_string_view<char> &KeyFileName, const RSA_KEY_FILE Flag) noexcept
     {
         FileSink KeyFileSinker(KeyFileName.data());
-        if (Flag == Viper::RSA_KEY_FILE::PUBLIC)
+        if (Flag == ViperCipher::RSA_KEY_FILE::PUBLIC)
             KeyFileSinker.Put(reinterpret_cast<const CryptoPP::byte *>(this->Blocks.public_key_pem.data()), this->Blocks.public_key_pem.size());
         else
             KeyFileSinker.Put(reinterpret_cast<const CryptoPP::byte *>(this->Blocks.private_key_pem.data()), this->Blocks.private_key_pem.size());
