@@ -237,6 +237,23 @@ int main(int argc, char **argv) {
 
     Viper viper = new Viper();                                                                           
 
+    string_view pipe_file         = "attack_table.txt";                                                  // <-- dictionary table source file(supposing is in current dir)
+
+    string  sha256_cipher_target1 = "FB5597D8647D451ABA9CE78B8CEDC238E3F0EAE6D7D4900C7DEA9D82CEC872C0";  // <-- hashed "agony" with 256 bit block size
+    string  sha256_cipher_target2 = "BCC649CFDB8CC557053DA67DF7E7FCB740DCF7F721CEBE1F2082597AD0D5E7D8";  // <-- hashed "found" with 256 bit block size
+    string  sha256_cipher_target3 = "5E884898DA28047151D0E56F8DC6292773603D0D6AABBDD62A11EF721D1542D8";  // <-- hashed "password" with 256 bit block size
+    string  sha256_cipher_target4 = "921A320AA9782C475560FF5136A8CC0B25F3ADF0DE751D918C9D78B105D2E368";  // <-- hashed "conspire" with 256 bit block size
+    string  sha256_cipher_target5 = "D90EE9CCF6BEA1D2942A7B21319338198DEC2A746F8A0D0771621F00DA2E0864";  // <-- hashed "drop" with 256 bit block size
+
+    const uint64_t operation_speed = 5000UL;                                                             // <-- the speed of loop execution
+
+    viper->CipherAttack( { sha256_cipher_target5, sha256_cipher_target4, sha256_cipher_target3, sha256_cipher_target2, sha256_cipher_target1 },
+                         pipe_file,
+                         ViperCipher::SHA_BLOCK_SIZE::SHA256,
+                         operation_speed );
+
+    viper->ThreadWait(); // wait for the termination signal dispatched by CipherAttack() on operation execution done.
+                         // This functoin call can also be chained with CipherAttack().ThreadWait()
     
     return 0;
 };
