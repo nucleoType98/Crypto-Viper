@@ -22,8 +22,8 @@ int main(int argc, char **argv)
 
     Viper *viper = new Viper();
 
-    string enc = viper->Encrypt(plain);
-    string dec = viper->Decrypt(enc);
+    string_view enc = viper->Encrypt(plain);
+    string_view dec = viper->Decrypt(enc);
     
     std::cout << "Encrypted: " << enc << std::endl;
     std::cout << "Decrypted: " << dec << std::endl;
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 
     Viper *viper = new Viper();                                                           
 
-    string hashed = viper->Hash(plain);                           
+    string_view hashed = viper->Hash(plain);                           
     delete viper;
     return 0;
 };
@@ -85,15 +85,15 @@ int main(int argc, char **argv) {
 
     Viper *viper = new Viper();                                                                       
 
-    string hash_sha1 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA1);
+    string_view hash_sha1 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA1);
 
-    string hash_sha1224 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA224);
+    string_view hash_sha1224 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA224);
 
-    string hash_sha256 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA256);
+    string_view hash_sha256 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA256);
 
-    string hash_sha384 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA384);
+    string_view hash_sha384 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA384);
 
-    string hash_sha512 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA512);    
+    string_view hash_sha512 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA512);    
 
     delete viper;
     return 0;
@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
 
     viper->GenRsaPublicKey();                      // gen key
  
-    string get_key = viper->GetPublicKey();     // export key
+    string   get_key = viper->getPublicKey();     // export key
 
     /**************** OR *****************/
 
@@ -149,7 +149,7 @@ int main(int argc, char **argv) {
 
     viper->GenRsaPrivateKey();                         // gen key
  
-    string get_key = viper->GetPrivateKey();           // export key
+    string get_key = viper->getPrivateKey();           // export key
 
 
     /**************** OR *****************/
@@ -183,17 +183,18 @@ using namespace ViperCipher;
 
 int main(int argc, char **argv) {
 
-    Viper viper = new Viper();                                                                           
+    Viper *viper = new Viper();                                                                           
 
-    viper->GenRsaPrivateKey("private.pem", ViperCipher::Viper::RSA_KEY_FLAG::FILE_COLLECTOR);    // gen key
+    viper->GenRsaPrivateKey("private.pem", ViperCipher::RSA_KEY_FLAG::FILE_COLLECTOR);    // gen key
  
-    string get_key = viper->GetPrivateKey();                                                     // export key
+    string_view get_key = viper->getPrivateKey();                                                     // export key
 
 
     /**************** OR *****************/
 
-    string get_key = viper->GenRsaPrivateKey("private.pem", ViperCipher::Viper::RSA_KEY_FLAG::FILE_COLLECTOR).getPrivateKey();
-
+    string get_key = viper->GenRsaPrivateKey("private.pem", ViperCipher::RSA_KEY_FLAG::FILE_COLLECTOR).getPrivateKey();
+    
+    delete viper;
     return 0;
 };
 
@@ -215,12 +216,15 @@ using namespace ViperCipher;
 
 int main(int argc, char **argv) {
 
-    Viper viper = new Viper();                                                                           
+    Viper *viper = new Viper();                                                                           
 
     viper->RevokeKeyIv();
+
+    delete viper;
  
     return 0;
 };
+
 
 
 ```
@@ -242,7 +246,7 @@ using namespace ViperCipher;
 
 int main(int argc, char **argv) {
 
-    Viper viper = new Viper();                                                                           
+    Viper *viper = new Viper();                                                                           
 
     string_view pipe_file         = "attack_table.txt";                                                  // <-- dictionary table source file(supposing is in current dir)
 
@@ -276,6 +280,7 @@ int main(int argc, char **argv) {
     
     return 0;
 };
+
 
 
 ```
