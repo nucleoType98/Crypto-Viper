@@ -109,6 +109,58 @@ int main(int argc, char **argv) {
 
 ```
 
+### AES Public Key
+
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "lib/viper.hpp"
+
+using namespace std;
+using namespace ViperCipher;
+
+int main(int argc, char **argv) {
+
+    std::basic_string_view<char> plain = "sucker";                                                            // plain text string to hash
+
+    Viper *NewViper = new Viper();                                                                            // use default constructor
+
+    std::basic_string_view<char> encrypted = NewViper->Encrypt(plain);                                        // Encrypt plain text
+
+    std::basic_string_view<char> decrypted = NewViper->Decrypt(static_cast<std::string>(encrypted));          // Decrypt encrypted cipher
+
+    return 0;
+};
+
+```
+
+### AES Private Key
+
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "lib/viper.hpp"
+
+using namespace std;
+using namespace ViperCipher;
+
+int main(int argc, char **argv) {
+
+    std::basic_string_view<char> plain = "sucker";                                                            // plain text string to hash
+
+    Viper *NewViper = new Viper();                                                                            // use default constructor
+
+    std::basic_string_view<char> encrypted = NewViper->Encrypt(plain);                                        // Encrypt plain text
+
+    std::basic_string_view<char> decrypted = NewViper->Decrypt(static_cast<std::string>(encrypted));          // Decrypt encrypted cipher
+
+    return 0;
+};
+
+```
+
 ## Abstracted Code Semantics
 
 ## Description
