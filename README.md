@@ -3,22 +3,106 @@
 
 A simple light-weight crypto library written in c++ for c++.
 
+## Detailed Code Semantics
+
+> In this Section we will go deeper into code semantics and it's approach.
+
+### Hash
+
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "lib/viper.hpp"
+
+using namespace std;
+using namespace ViperCipher;
+
+int main(int argc, char **argv) {
+
+    std::basic_string_view<char> plain = "sucker";                                           // plain text string to hash
+
+    Viper *NewViper = new Viper();                                                           // use default constructor
+
+    std::basic_string_view<char> hashed = NewViper->Hash(plain);                             // Hash plain text
+
+    return 0;
+};
+
+```
+
+### Encrypt
+
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "lib/viper.hpp"
+
+using namespace std;
+using namespace ViperCipher;
+
+int main(int argc, char **argv) {
+
+    std::string plain = "sucker";                                                            // plain text string to hash
+
+    Viper *NewViper = new Viper();                                                           // use default constructor
+
+    std::string encrypted = NewViper->Encrypt(plain);                                        // Encrypt plain text
+
+    return 0;
+};
+
+```
+
+### Decrypt
+
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "lib/viper.hpp"
+
+using namespace std;
+using namespace ViperCipher;
+
+int main(int argc, char **argv) {
+
+    std::basic_string_view<char> plain = "sucker";                                                            // plain text string to hash
+
+    Viper *NewViper = new Viper();                                                                            // use default constructor
+
+    std::basic_string_view<char> encrypted = NewViper->Encrypt(plain);                                        // Encrypt plain text
+
+    std::basic_string_view<char> decrypted = NewViper->Decrypt(static_cast<std::string>(encrypted));          // Decrypt encrypted cipher
+
+    return 0;
+};
+
+```
+
+## Abstracted Code Semantics
+
 ## Description
 
-> this library allows you to easily integrate encryption, decryption, hashing and SHA[x] Reverse(Crack) Ciphers.
-Implementation resides within a light-weight class named Viper(here the repository name), to work with any of the above functionalities a Viper instance must be created.
+> The library facilitates encryption, decryption, hashing, and reverse cracking (SHA[x] Reverse Ciphers) functionalities through a lightweight class called "Viper."
+You need to create an instance of the "Viper" class to utilize these functionalities.
 
 ## Compatibility
 
-> I built and compiled this program on Linux Mint OS, IDK if it will work on Windows and Mac OS as well, some of the dependencies may not work on other platforms...
+* Developed and tested on Linux Mint OS, with potential compatibility issues on other platforms like Windows and macOS due to dependencies.
+
+## Compiler
+* Developed using g++20 compiler.
+* Compiler required flags: "-lcryptopp"
 
 
 ## Dependencies
-* Crypto++
-* Standard C++ Libraries
+* Dependencies include Crypto++ and standard C++ libraries.
 
 ## Memory Safety
-> The library is pretty safe by itself, been tested and compiled using g++ address-sanitizer flag, no memory leaks have been reported so far, you can try to compile the library again within your local environment, and see for yourself, you can re-compile using "compile.sh" shell script located in the root directory of the project.
+* Tested for memory safety using g++ address-sanitizer flag, with no reported memory leaks.
+* Encourages users to compile the library locally and check for memory leaks using the provided shell script.
 
 ## Namespace
 * ViperCipher
@@ -83,5 +167,3 @@ Implementation resides within a light-weight class named Viper(here the reposito
 
 ### Static
 * none
-
-  
