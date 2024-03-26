@@ -122,13 +122,11 @@ using namespace ViperCipher;
 
 int main(int argc, char **argv) {
 
-    std::basic_string_view<char> plain = "sucker";                                                            // plain text string to hash
+    Viper *NewViper = new Viper();                                                                           
 
-    Viper *NewViper = new Viper();                                                                            // use default constructor
-
-    std::basic_string_view<char> encrypted = NewViper->Encrypt(plain);                                        // Encrypt plain text
-
-    std::basic_string_view<char> decrypted = NewViper->Decrypt(static_cast<std::string>(encrypted));          // Decrypt encrypted cipher
+    BlackMamba->GenRsaPublicKey("public.pem");
+ 
+    string get_key = BlackMamba->GetRsaPublicKey();
 
     return 0;
 };
@@ -148,16 +146,15 @@ using namespace ViperCipher;
 
 int main(int argc, char **argv) {
 
-    std::basic_string_view<char> plain = "sucker";                                                            // plain text string to hash
+    Viper *NewViper = new Viper();                                                                           
 
-    Viper *NewViper = new Viper();                                                                            // use default constructor
-
-    std::basic_string_view<char> encrypted = NewViper->Encrypt(plain);                                        // Encrypt plain text
-
-    std::basic_string_view<char> decrypted = NewViper->Decrypt(static_cast<std::string>(encrypted));          // Decrypt encrypted cipher
+    BlackMamba->GenRsaPrivateKey("private.pem");
+ 
+    string get_key = BlackMamba->GetRsaPrivateKey();
 
     return 0;
 };
+
 
 ```
 
