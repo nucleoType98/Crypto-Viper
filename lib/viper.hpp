@@ -181,7 +181,7 @@ class Viper
      * @param const std::string target
      * @returns const std::basic_string_view<char>
      */
-    const std::basic_string_view<char> Decrypt(const std::string &target) noexcept
+    const std::basic_string_view<char> Decrypt(const std::basic_string_view<char> &target) noexcept
     {
         try
         {
@@ -192,7 +192,7 @@ class Viper
                 CBC_Mode<AES>::Decryption CbcDecryption;
 
                 CbcDecryption.SetKeyWithIV(this->use_key, this->use_key.size(), this->use_iv);
-                StringSource(this->Blocks.encrypted, true, new HexDecoder(new StreamTransformationFilter(CbcDecryption, new StringSink(this->Blocks.decrypted))));
+                StringSource((this->Blocks.encrypted.length() > 0) ? this->Blocks.encrypted : (std::string)target, true, new HexDecoder(new StreamTransformationFilter(CbcDecryption, new StringSink(this->Blocks.decrypted))));
             }
         }
         catch (const CryptoPP::Exception &__E)
