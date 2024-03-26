@@ -328,12 +328,9 @@ class Viper
      * @param const unsigned long int - the speed of each iteration
      * @returns void
      */
-    ViperCipher::Viper &CipherAttack(
-        const std::initializer_list<std::basic_string<char>> &cipher_target_list, 
-    const std::basic_string_view<char> &target_file,
-    const SHA_BLOCK_SIZE use_sha_mode = SHA_BLOCK_SIZE::SHA256, 
-    const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode = CIPHER_ATTACK_ALGO_MODE::DEFAULT,
-    const unsigned long int crack_speed_ms = 10000) noexcept
+    ViperCipher::Viper &CipherAttack(const std::initializer_list<std::basic_string<char>> &cipher_target_list, const std::basic_string_view<char> &target_file,
+                                     const SHA_BLOCK_SIZE use_sha_mode = SHA_BLOCK_SIZE::SHA256, const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode = CIPHER_ATTACK_ALGO_MODE::DEFAULT,
+                                     const unsigned long int crack_speed_ms = 10000) noexcept
     {
 
         std::cout << "Nunber of entries to crack: " << cipher_target_list.size() << std::endl;
@@ -398,24 +395,81 @@ class Viper
         return *this;
     };
 
-    ViperCipher::Viper &CipherAttackDetached(
-        const std::initializer_list<std::basic_string<char>> &cipher_target, 
-        const std::basic_string_view<char> &target_file,
-        const SHA_BLOCK_SIZE use_sha_mode = SHA_BLOCK_SIZE::SHA256, 
-        const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode = CIPHER_ATTACK_ALGO_MODE::DEFAULT,
-        const unsigned long int crack_speed_ms = 10000) noexcept
+    ViperCipher::Viper &CipherAttackDetached(const std::initializer_list<std::basic_string<char>> &cipher_target_list, const std::basic_string_view<char> &target_file,
+                                             const SHA_BLOCK_SIZE use_sha_mode = SHA_BLOCK_SIZE::SHA256, const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode = CIPHER_ATTACK_ALGO_MODE::DEFAULT,
+                                             const unsigned long int crack_speed_ms = 10000) noexcept
     {
-
-        std::function<void()> cb = [&](void) -> void {
-            this->CipherAttack(cipher_target, target_file, use_sha_mode, algo_cipher_mode, crack_speed_ms);
-            return;
-        };
-        std::thread execThread(cb);
-        if (execThread.joinable())
+        try
         {
-            execThread.detach();
-        }
+            std::function<void()> cb = [cipher_target_list = std::vector<std::basic_string<char>>(cipher_target_list.begin(), cipher_target_list.end()), target_file, use_sha_mode, algo_cipher_mode, crack_speed_ms, this]() -> void {
+                std::cout << "Nunber of entries to crack: " << cipher_target_list.size() << std::endl;
+                this->cipher_crack_entries = cipher_target_list.size();
+                if (cipher_target_list.size() > 0)
+                {
+                    std::vector<std::string> attack_list;
+                    std::fstream TableGetEntries(target_file.data());
+                    std::string collect;
+                    if (TableGetEntries.is_open())
+                    {
+                        std::cout << "Aquiring Resources from <" << target_file << ">" << std::endl;
+                        while (std::getline(TableGetEntries, collect))
+                        {
+                            std::cout << collect << std::flush;
+                            attack_list.push_back(collect);
+                            std::cout << std::endl;
+                        }
+                    }
 
+                    TableGetEntries.close();
+
+                    std::cout << "\nCollected (" << attack_list.size() << ")\n"
+                              << "Loading entries, 1 second ..." << std::endl;
+
+                    std::this_thread::sleep_for(std::chrono::microseconds(4000000));
+
+                    std::string result = "";
+
+                    std::function<bool()> block_match = [&]() -> bool {
+                        bool got_exposed = false;
+                        for (auto &x : cipher_target_list)
+                            if (result == x)
+                                got_exposed = true;
+
+                        return got_exposed;
+                    };
+
+                    for (auto &list_target : attack_list)
+                    {
+                        if (list_target.empty() == false && list_target.length() > 0)
+                        {
+                            this->is_cracker_running = true;
+                            if (use_sha_mode == SHA_BLOCK_SIZE::SHA256)
+                            {
+                                result.clear();
+                                StringSource(list_target, true, new HashFilter(this->ShaMode.s256, new HexEncoder(new StringSink(result))));
+                                std::cout << result << std::flush << std::endl;
+                                if (block_match() == true)
+                                {
+                                    gMutex.try_lock();
+                                    this->CrackRegister.push_back({list_target, result});
+                                    gMutex.unlock();
+                                }
+                                std::this_thread::sleep_for(std::chrono::microseconds(crack_speed_ms));
+                            }
+                        }
+                    }
+                    std::cout << "Resource Scan Finished!" << std::endl;
+                    this->is_cracker_running = false;
+                }
+            };
+
+            std::thread t(cb);
+            t.detach();
+        }
+        catch (...)
+        {
+            std::cout << "Error Cipher Attack Detached Mode" << std::endl;
+        }
         return *this;
     };
 
