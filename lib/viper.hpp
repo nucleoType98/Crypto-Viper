@@ -34,61 +34,61 @@
 using namespace CryptoPP;
 
 namespace ViperCipher
-{ 
+{
 
 std::mutex gMutex;
 
 #define __BUFFER_MAX_SIZE__ (unsigned int)4096u
 
- typedef struct alignas(void *)
-    {
-        std::basic_string<char> plain;
-        std::basic_string<char> hashed;
-        std::basic_string<char> encrypted;
-        std::basic_string<char> decrypted;
-        std::basic_string<char> public_key_pem;
-        std::basic_string<char> private_key_pem;
-    } BlockStructure;
+typedef struct alignas(void *)
+{
+    std::basic_string<char> plain;
+    std::basic_string<char> hashed;
+    std::basic_string<char> encrypted;
+    std::basic_string<char> decrypted;
+    std::basic_string<char> public_key_pem;
+    std::basic_string<char> private_key_pem;
+} BlockStructure;
 
-    typedef struct alignas(void *)
-    {
-        std::string raw;
-        std::string hash;
-    } CrackedCipherStructure;
+typedef struct alignas(void *)
+{
+    std::string raw;
+    std::string hash;
+} CrackedCipherStructure;
 
-    typedef struct alignas(void *)
-    {
-        SHA1 s1;
-        SHA224 s224;
-        SHA256 s256;
-        SHA384 s384;
-        SHA512 s512;
-    } ShaModeStructure;
+typedef struct alignas(void *)
+{
+    SHA1 s1;
+    SHA224 s224;
+    SHA256 s256;
+    SHA384 s384;
+    SHA512 s512;
+} ShaModeStructure;
 
-    enum class RSA_KEY_FLAG : unsigned short int
-    {
-        FILE_COLLECTOR = 0,
-        SCRIPT_COLLECTOR,
-        DEFAULT
-    };
+enum class RSA_KEY_FLAG : unsigned short int
+{
+    FILE_COLLECTOR = 0,
+    SCRIPT_COLLECTOR,
+    DEFAULT
+};
 
-    enum class RSA_KEY_FILE : unsigned short int
-    {
-        PUBLIC = 0,
-        PRIVATE = 1
-    };
+enum class RSA_KEY_FILE : unsigned short int
+{
+    PUBLIC = 0,
+    PRIVATE = 1
+};
 
-    enum class SHA_BLOCK_SIZE : unsigned short int
-    {
-        SHA1 = 1,
-        SHA224 = 224,
-        SHA256 = 256,
-        SHA384 = 384,
-        SHA512 = 512
-    };
+enum class SHA_BLOCK_SIZE : unsigned short int
+{
+    SHA1 = 1,
+    SHA224 = 224,
+    SHA256 = 256,
+    SHA384 = 384,
+    SHA512 = 512
+};
 
 class Viper
-{   
+{
   private:
     BlockStructure Blocks;
     std::vector<CrackedCipherStructure> CrackRegister;
@@ -192,7 +192,8 @@ class Viper
                 CBC_Mode<AES>::Decryption CbcDecryption;
 
                 CbcDecryption.SetKeyWithIV(this->use_key, this->use_key.size(), this->use_iv);
-                StringSource((this->Blocks.encrypted.length() > 0) ? this->Blocks.encrypted : (std::string)target, true, new HexDecoder(new StreamTransformationFilter(CbcDecryption, new StringSink(this->Blocks.decrypted))));
+                StringSource((this->Blocks.encrypted.length() > 0) ? this->Blocks.encrypted : (std::string)target, true,
+                             new HexDecoder(new StreamTransformationFilter(CbcDecryption, new StringSink(this->Blocks.decrypted))));
             }
         }
         catch (const CryptoPP::Exception &__E)
@@ -217,18 +218,19 @@ class Viper
         try
         {
             this->Blocks.public_key_pem.clear();
+
+            const unsigned short int BLOCK_SIZE = 2048u;
+            memset((void *)&this->Blocks.public_key_pem, 0, sizeof(std::string));
+
+            InvertibleRSAFunction RSAKeyGen;
+
+            RSAKeyGen.GenerateRandomWithKeySize(this->SystemEntropy, BLOCK_SIZE);
+            RSA::PublicKey publicKey(RSAKeyGen);
+
+            publicKey.Save(Base64Encoder(new StringSink(this->Blocks.public_key_pem)).Ref());
+
             if (KeyFileName.empty() == false && KeyFileName.length() > 0)
             {
-                const unsigned short int BLOCK_SIZE = 2048u;
-                memset((void *)&this->Blocks.public_key_pem, 0, sizeof(std::string));
-
-                InvertibleRSAFunction RSAKeyGen;
-
-                RSAKeyGen.GenerateRandomWithKeySize(this->SystemEntropy, BLOCK_SIZE);
-                RSA::PublicKey publicKey(RSAKeyGen);
-
-                publicKey.Save(Base64Encoder(new StringSink(this->Blocks.public_key_pem)).Ref());
-
                 if (static_cast<int>(Flag) == static_cast<int>(RSA_KEY_FLAG::DEFAULT) || static_cast<int>(Flag) == static_cast<int>(RSA_KEY_FLAG::FILE_COLLECTOR))
                 {
                     this->FileCollect(KeyFileName, RSA_KEY_FILE::PUBLIC);
@@ -257,18 +259,19 @@ class Viper
         try
         {
             this->Blocks.private_key_pem.clear();
+
+            const unsigned short int BLOCK_SIZE = 2048u;
+            memset((void *)&this->Blocks.private_key_pem, 0, sizeof(std::string));
+
+            InvertibleRSAFunction RSAKeyGen;
+
+            RSAKeyGen.GenerateRandomWithKeySize(this->SystemEntropy, BLOCK_SIZE);
+            RSA::PrivateKey privateKey(RSAKeyGen);
+
+            privateKey.Save(Base64Encoder(new StringSink(this->Blocks.private_key_pem)).Ref());
+
             if (KeyFileName.empty() == false && KeyFileName.length() > 0)
             {
-                const unsigned short int BLOCK_SIZE = 2048u;
-                memset((void *)&this->Blocks.private_key_pem, 0, sizeof(std::string));
-
-                InvertibleRSAFunction RSAKeyGen;
-
-                RSAKeyGen.GenerateRandomWithKeySize(this->SystemEntropy, BLOCK_SIZE);
-                RSA::PrivateKey privateKey(RSAKeyGen);
-
-                privateKey.Save(Base64Encoder(new StringSink(this->Blocks.private_key_pem)).Ref());
-
                 if (static_cast<int>(Flag) == static_cast<int>(RSA_KEY_FLAG::DEFAULT) || static_cast<int>(Flag) == static_cast<int>(RSA_KEY_FLAG::FILE_COLLECTOR))
                 {
                     this->FileCollect(KeyFileName, RSA_KEY_FILE::PRIVATE);
