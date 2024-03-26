@@ -266,13 +266,15 @@ int main(int argc, char **argv) {
       * ----------- PARAMETER LIST ------------
       * @param initializer_list<string>                  -> Mandatory   -> the list of records to attack
       * @param string_view                               -> Mandatory   -> the file name to scan
-      * @param SHA_BLOCK_SIZE                            -> Optional    -> the hash algorithm to use                               / Default  = SHA_BLOCK_SIZE::SHA256
+      * @param SHA_BLOCK_SIZE                            -> Optional    -> the hash algorithm to use                               / Default  =SHA_BLOCK_SIZE::SHA256
+      * @param CIPHER_ATTACK_ALGO_MODE                   -> Optional    -> the algorithm deduction mode                            / Default  = CIPHER_ATTACK_ALGO_MODE::DEFAULT
       * @param uint64_t                                  -> Optional    -> the loop execution speed in microseconds format         / Default  = 10000  
       */
 
     viper->CipherAttack( { sha256_cipher_target5, sha256_cipher_target4, sha256_cipher_target3, sha256_cipher_target2, sha256_cipher_target1 },
                          pipe_file,
                          ViperCipher::SHA_BLOCK_SIZE::SHA256,
+                         CIPHER_ATTACK_ALGO_MODE::DEFAULT,
                          operation_speed );
 
     viper->ThreadWait(); // wait for the termination signal dispatched by CipherAttack() on operation execution done.
