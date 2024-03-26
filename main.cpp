@@ -3,20 +3,22 @@
 using namespace std;
 using namespace ViperCipher;
 
+using String std::basic_string_view<char>; // alias
+
 int main(int argc, char **argv)
 {
 
-    std::basic_string_view<char>  plain_text = "something to hash";
+    String  plain = "something to hash";
 
-    Viper *BlackMamba = new Viper();
+    Viper *viper = new Viper();
 
-    std::basic_string_view<char> encrypted = BlackMamba->Encrypt(plain_text);
-    WStr decrypted = BlackMamba->Decrypt(encrypted);
+    String enc = viper->Encrypt(plain);
+    String dec = viper->Decrypt(enc);
     
-    std::cout << "Encrypted: " << encrypted << std::endl;
-    std::cout << "Decrypted: " << decrypted << std::endl;
+    std::cout << "Encrypted: " << enc << std::endl;
+    std::cout << "Decrypted: " << dec << std::endl;
  
-    delete BlackMamba;
+    delete viper;
 
     return EXIT_SUCCESS;
 };
