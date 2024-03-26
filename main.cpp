@@ -1,7 +1,7 @@
 #include "lib/viper.hpp"
 
 using namespace std;
-
+ 
 using namespace ViperCipher;
 
 typedef std::basic_string_view<char> WStr;
@@ -16,11 +16,11 @@ int main(int argc, char **argv)
 
     Viper *BlackMamba = new Viper();
 
-    WStr hashed        = BlackMamba->Hash(original_text, Viper::SHA_BLOCK_SIZE::SHA256);
+    WStr hashed        = BlackMamba->Hash(original_text, ViperCipher::SHA_BLOCK_SIZE::SHA256);
     WStr encrypted     = BlackMamba->Encrypt(original_text);
     WStr decrypted     = BlackMamba->Decrypt(static_cast<std::string>(encrypted));
-    Str  PublicKeyPem  = BlackMamba->GenRsaPublicKey(pem_public_file, ViperCipher::Viper::RSA_KEY_FLAG::DEFAULT).getPublicKey();
-    Str  PrivateKeyPem = BlackMamba->GenRsaPrivateKey(pem_private_file, ViperCipher::Viper::RSA_KEY_FLAG::FILE_COLLECTOR).getPrivateKey();
+    Str  PublicKeyPem  = BlackMamba->GenRsaPublicKey(pem_public_file, ViperCipher::RSA_KEY_FLAG::DEFAULT).getPublicKey();
+    Str  PrivateKeyPem = BlackMamba->GenRsaPrivateKey(pem_private_file, ViperCipher::RSA_KEY_FLAG::FILE_COLLECTOR).getPrivateKey();
     Str  hash_attack1  = "";
     Str  hash_attack2  = "";
     Str  hash_attack3  = "";
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 
     const unsigned long int operation_speed = 5000;
 
-    BlackMamba->CipherAttack({sha256_cipher_target5, sha256_cipher_target4, sha256_cipher_target3, sha256_cipher_target2, sha256_cipher_target1}, pipe_file, Viper::SHA_BLOCK_SIZE::SHA256, operation_speed).ThreadWait();
+    BlackMamba->CipherAttack({sha256_cipher_target5, sha256_cipher_target4, sha256_cipher_target3, sha256_cipher_target2, sha256_cipher_target1}, pipe_file, ViperCipher::SHA_BLOCK_SIZE::SHA256, operation_speed).ThreadWait();
 
     delete BlackMamba;
 
