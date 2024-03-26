@@ -87,6 +87,14 @@ enum class SHA_BLOCK_SIZE : unsigned short int
     SHA512 = 512
 };
 
+enum class CIPHER_ATTACK_ALGO_MODE : unsigned short int
+{
+    INFER = 0,
+    ENFORCE,
+    SMART,
+    DEFAULT
+};
+
 class Viper
 {
   private:
@@ -320,8 +328,12 @@ class Viper
      * @param const unsigned long int - the speed of each iteration
      * @returns void
      */
-    ViperCipher::Viper &CipherAttack(const std::initializer_list<std::basic_string<char>> &cipher_target_list, const std::basic_string_view<char> &target_file,
-                                     const SHA_BLOCK_SIZE use_sha_mode = SHA_BLOCK_SIZE::SHA256, const unsigned long int crack_speed_ms = 10000) noexcept
+    ViperCipher::Viper &CipherAttack(
+        const std::initializer_list<std::basic_string<char>> &cipher_target_list, 
+    const std::basic_string_view<char> &target_file,
+    const SHA_BLOCK_SIZE use_sha_mode = SHA_BLOCK_SIZE::SHA256, 
+    const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode = CIPHER_ATTACK_ALGO_MODE::DEFAULT,
+    const unsigned long int crack_speed_ms = 10000) noexcept
     {
 
         std::cout << "Nunber of entries to crack: " << cipher_target_list.size() << std::endl;
@@ -386,12 +398,16 @@ class Viper
         return *this;
     };
 
-    ViperCipher::Viper &CipherAttackDetached(const std::initializer_list<std::basic_string<char>> &cipher_target, const std::basic_string_view<char> &target_file,
-                                             const SHA_BLOCK_SIZE use_sha_mode = SHA_BLOCK_SIZE::SHA256, const unsigned long int crack_speed_ms = 10000) noexcept
+    ViperCipher::Viper &CipherAttackDetached(
+        const std::initializer_list<std::basic_string<char>> &cipher_target, 
+        const std::basic_string_view<char> &target_file,
+        const SHA_BLOCK_SIZE use_sha_mode = SHA_BLOCK_SIZE::SHA256, 
+        const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode = CIPHER_ATTACK_ALGO_MODE::DEFAULT,
+        const unsigned long int crack_speed_ms = 10000) noexcept
     {
 
         std::function<void()> cb = [&](void) -> void {
-            this->CipherAttack(cipher_target, target_file, use_sha_mode, crack_speed_ms);
+            this->CipherAttack(cipher_target, target_file, use_sha_mode, algo_cipher_mode, crack_speed_ms);
             return;
         };
         std::thread execThread(cb);
