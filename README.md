@@ -252,7 +252,15 @@ int main(int argc, char **argv) {
     string  sha256_cipher_target4 = "921A320AA9782C475560FF5136A8CC0B25F3ADF0DE751D918C9D78B105D2E368";  // <-- hashed "conspire" with 256 bit block size
     string  sha256_cipher_target5 = "D90EE9CCF6BEA1D2942A7B21319338198DEC2A746F8A0D0771621F00DA2E0864";  // <-- hashed "drop" with 256 bit block size
 
-    const uint64_t operation_speed = 5000UL;                                                             // <-- the speed of loop execution
+    const uint64_t operation_speed = 5000UL;                                                             // <-- loop execution speed in microseconds format,  1 second = 1000000 microseconds
+
+    /**
+      * ----------- PARAMETER LIST ------------
+      * @param initializer_list<string>                  -> the list of records to attack
+      * @param string_view                               -> the file name to scan
+      * @param SHA_BLOCK_SIZE                            -> the hash algorithm to use
+      * @param uint64_t                                  -> the loop execution speed in microseconds format      
+      */
 
     viper->CipherAttack( { sha256_cipher_target5, sha256_cipher_target4, sha256_cipher_target3, sha256_cipher_target2, sha256_cipher_target1 },
                          pipe_file,
