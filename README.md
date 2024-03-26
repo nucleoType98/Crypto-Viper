@@ -2,12 +2,12 @@
 # C++ Crypto Viper
 
 A simple light-weight crypto library written in c++ for c++.
-
+ 
 ## Detailed Code Semantics
 
 ### Simple Encryption/Decryption
 
-> Symmetric Encryption/Decryption using AES encryption algorithm, this uses a fixed size data blocks [256 bits].  
+> Symmetric Encryption/Decryption using AES/CBC encryption.
 
 ```cpp
 #include "lib/viper.hpp"
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 
 ### Hash
 
-> Hash a string using a SHA-256 bit Block Size(64 bytes), the function takes a reference to a plain text string and returns a hashed version.
+> Hash a string using SHA-256(DEFAULT) Algorithm.
 
 ```cpp
 #include <iostream>
@@ -60,9 +60,8 @@ int main(int argc, char **argv) {
 
 ```
 
-### Specify Hash Block Size
+### Specify Hash Algorithm
 
-> In the previous section we used a default block size(256 bits), you can also specify a different block size directly within the function argument.
 Available Options:
 
 * SHA_BLOCK_SIZE::SHA1
@@ -86,14 +85,23 @@ int main(int argc, char **argv) {
 
     Viper *viper = new Viper();                                                                       
 
-    string hashed = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA1);    
+    string hash_sha1 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA1);
+
+    string hash_sha1224 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA224);
+
+    string hash_sha256 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA256);
+
+    string hash_sha384 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA384);
+
+    string hash_sha512 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA512);    
+
     delete viper;
     return 0;
 };
 
 ```
 
-### Gen AES Public Key
+### Gen RSA Public Key
 
 > Generate a public key using RSA standard, 
 
@@ -110,16 +118,21 @@ int main(int argc, char **argv) {
 
     Viper *viper = new Viper();                                                                           
 
-    viper->GenRsaPublicKey("public.pem");
+    viper->GenRsaPublicKey();                      // gen key
  
-    string get_key = viper->GetRsaPublicKey();
+    string get_key = viper->GetPublicKey();     // export key
+
+    /**************** OR *****************/
+
+    string get_key = viper->GenRsaPublicKey().getPublicKey();
+
     delete viper;
     return 0;
 };
 
 ```
 
-### Gen AES Private Key
+### Gen RSA Private Key
 
 ```cpp
 #include <iostream>
@@ -132,12 +145,99 @@ using namespace ViperCipher;
 
 int main(int argc, char **argv) {
 
-    Viper *NewViper = new Viper();                                                                           
+    Viper *viper = new Viper();                                                                           
 
-    BlackMamba->GenRsaPrivateKey("private.pem");
+    viper->GenRsaPrivateKey();                         // gen key
  
-    string get_key = BlackMamba->GetRsaPrivateKey();
+    string get_key = viper->GetPrivateKey();           // export key
 
+
+    /**************** OR *****************/
+
+    string get_key = viper->GenRsaPrivateKey().getPrivateKey();
+
+    return 0;
+};
+
+
+```
+
+### Gen RSA Private/Public Key and Store them File
+
+> Provide a path for the file to store key into as first argument, as second argument a Flag describing the destination store type, The default behavior(RSA_KEY_FLAG::SCRIPT_COLLECTOR) is to store the key locally within the code, to store a key within a file RSA_KEY_FLAG::FILE_COLLECTOR Flag is required
+
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "lib/viper.hpp"
+
+using namespace std;
+using namespace ViperCipher;
+
+int main(int argc, char **argv) {
+
+    Viper viper = new Viper();                                                                           
+
+    viper->GenRsaPrivateKey("private.pem", ViperCipher::Viper::RSA_KEY_FLAG::FILE_COLLECTOR);    // gen key
+ 
+    string get_key = viper->GetPrivateKey();                                                     // export key
+
+
+    /**************** OR *****************/
+
+    string get_key = viper->GenRsaPrivateKey("private.pem", ViperCipher::Viper::RSA_KEY_FLAG::FILE_COLLECTOR).getPrivateKey();
+
+    return 0;
+};
+
+
+```
+
+### Revoke Key/IV
+
+> Revoke the current key/iv used for crypto operations.
+
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "lib/viper.hpp"
+
+using namespace std;
+using namespace ViperCipher;
+
+int main(int argc, char **argv) {
+
+    Viper viper = new Viper();                                                                           
+
+    viper->RevokeKeyIv();
+ 
+    return 0;
+};
+
+
+```
+
+
+### Hash Cipher Attack
+
+> Crack some hashed entries.
+
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "lib/viper.hpp"
+
+using namespace std;
+using namespace ViperCipher;
+
+int main(int argc, char **argv) {
+
+    Viper viper = new Viper();                                                                           
+
+    
     return 0;
 };
 
