@@ -95,6 +95,8 @@ int main(int argc, char **argv) {
 
 ### Gen AES Public Key
 
+> Generate a public key using RSA standard, 
+
 ```cpp
 #include <iostream>
 #include <stdio.h>
