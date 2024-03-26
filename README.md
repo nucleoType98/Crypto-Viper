@@ -1,30 +1,29 @@
 
-# Crypto Viper c++ Crypto Blaster
+# C++ Crypto Viper
 
 A simple light-weight crypto library written in c++ for c++.
 
 ## Detailed Code Semantics
 
-> In this Section we will go deeper into code semantics and it's approach.
-
 ### Simple Encryption/Decryption
+
+> Symmetric Encryption/Decryption using AES encryption algorithm, this uses a fixed size data blocks [256 bits].  
+
 ```cpp
 #include "lib/viper.hpp"
 
 using namespace std;
 using namespace ViperCipher;
 
-using String std::basic_string_view<char>; // alias
-
 int main(int argc, char **argv)
 {
 
-    String  plain = "something to hash";
+    string  plain = "something to hash";
 
     Viper *viper = new Viper();
 
-    String enc = viper->Encrypt(plain);
-    String dec = viper->Decrypt(enc);
+    string enc = viper->Encrypt(plain);
+    string dec = viper->Decrypt(enc);
     
     std::cout << "Encrypted: " << enc << std::endl;
     std::cout << "Decrypted: " << dec << std::endl;
@@ -37,6 +36,8 @@ int main(int argc, char **argv)
 
 ### Hash
 
+> Hash a string using a SHA-256 bit Block Size(64 bytes), the function takes a reference to a plain text string and returns a hashed version.
+
 ```cpp
 #include <iostream>
 #include <stdio.h>
@@ -48,18 +49,27 @@ using namespace ViperCipher;
 
 int main(int argc, char **argv) {
 
-    std::basic_string_view<char> plain = "sucker";                                           // plain text string to hash
+    string plain = "sucker";                                          
 
-    Viper *NewViper = new Viper();                                                           // use default constructor
+    Viper *viper = new Viper();                                                           
 
-    std::basic_string_view<char> hashed = NewViper->Hash(plain);                             // Hash plain text
-
+    string hashed = viper->Hash(plain);                           
+    delete viper;
     return 0;
 };
 
 ```
 
-### Encrypt
+### Specify Hash Block Size
+
+> In the previous section we used a default block size(256 bits), you can also specify a different block size directly within the function argument.
+Available Options:
+
+* SHA_BLOCK_SIZE::SHA1
+* SHA_BLOCK_SIZE::SHA224
+* SHA_BLOCK_SIZE::SHA256
+* SHA_BLOCK_SIZE::SHA384
+* SHA_BLOCK_SIZE::SHA512
 
 ```cpp
 #include <iostream>
@@ -72,18 +82,18 @@ using namespace ViperCipher;
 
 int main(int argc, char **argv) {
 
-    std::string plain = "sucker";                                                            // plain text string to hash
+    string plain = "sucker";                                                       
 
-    Viper *NewViper = new Viper();                                                           // use default constructor
+    Viper *viper = new Viper();                                                                       
 
-    std::string encrypted = NewViper->Encrypt(plain);                                        // Encrypt plain text
-
+    string hashed = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA1);    
+    delete viper;
     return 0;
 };
 
 ```
 
-### Decrypt
+### Gen AES Public Key
 
 ```cpp
 #include <iostream>
@@ -96,44 +106,18 @@ using namespace ViperCipher;
 
 int main(int argc, char **argv) {
 
-    std::basic_string_view<char> plain = "sucker";                                                            // plain text string to hash
+    Viper *viper = new Viper();                                                                           
 
-    Viper *NewViper = new Viper();                                                                            // use default constructor
-
-    std::basic_string_view<char> encrypted = NewViper->Encrypt(plain);                                        // Encrypt plain text
-
-    std::basic_string_view<char> decrypted = NewViper->Decrypt(static_cast<std::string>(encrypted));          // Decrypt encrypted cipher
-
-    return 0;
-};
-
-```
-
-### AES Public Key
-
-```cpp
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include "lib/viper.hpp"
-
-using namespace std;
-using namespace ViperCipher;
-
-int main(int argc, char **argv) {
-
-    Viper *NewViper = new Viper();                                                                           
-
-    BlackMamba->GenRsaPublicKey("public.pem");
+    viper->GenRsaPublicKey("public.pem");
  
-    string get_key = BlackMamba->GetRsaPublicKey();
-
+    string get_key = viper->GetRsaPublicKey();
+    delete viper;
     return 0;
 };
 
 ```
 
-### AES Private Key
+### Gen AES Private Key
 
 ```cpp
 #include <iostream>
