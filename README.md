@@ -276,9 +276,6 @@ int main(int argc, char **argv) {
                          ViperCipher::SHA_BLOCK_SIZE::SHA256,
                          CIPHER_ATTACK_ALGO_MODE::DEFAULT,
                          operation_speed );
-
-    viper->ThreadWait(); // wait for the termination signal dispatched by CipherAttack() on operation execution done.
-                         // This functoin call can also be chained with CipherAttack().ThreadWait()
     
     return 0;
 };
