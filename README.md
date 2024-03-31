@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
     string_view hash_sha1 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA1);
 
-    string_view hash_sha1224 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA224);
+    string_view hash_sha224 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA224);
 
     string_view hash_sha256 = viper->Hash(plain, ViperCipher::SHA_BLOCK_SIZE::SHA256);
 
