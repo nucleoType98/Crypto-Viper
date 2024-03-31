@@ -327,7 +327,7 @@ int main(int argc, char **argv) {
       * @param uint64_t                                  -> Optional    -> the loop execution speed in microseconds format         / Default  = 10000  
       */
 
-    viper->CipherAttack( { sha256_cipher_target5, sha256_cipher_target4, sha256_cipher_target3, sha256_cipher_target2, sha256_cipher_target1 },
+    viper->CipherAttackDetached( { sha256_cipher_target5, sha256_cipher_target4, sha256_cipher_target3, sha256_cipher_target2, sha256_cipher_target1 },
                          pipe_file,
                          ViperCipher::SHA_BLOCK_SIZE::SHA256,
                          CIPHER_ATTACK_ALGO_MODE::DEFAULT,
