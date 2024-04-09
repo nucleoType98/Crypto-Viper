@@ -3,7 +3,7 @@
 
 A simple light-weight crypto library written in c++ for c++.
  
-## Detailed Code Semantics
+## Code Semantics
 
 ### Simple Encryption/Decryption
 
