@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
 
 ```
 
-### Gen RSA Private/Public Key and Store into File/s
+### Gen RSA Private/Public Key and Store *_r* into appropriate File/s
 
 > Provide a path for the file to store key into as first argument, as second argument a Flag describing the destination store type, The default behavior(RSA_KEY_FLAG::SCRIPT_COLLECTOR) is to store the key locally within the code, to store a key within a file RSA_KEY_FLAG::FILE_COLLECTOR Flag is required
 
