@@ -314,10 +314,14 @@ class Viper
      */
     void RevokeKeyIv(void) noexcept
     {
+        try{
         this->use_key.New(AES::DEFAULT_KEYLENGTH);
         this->use_iv.New(AES::BLOCKSIZE);
         this->SystemEntropy.GenerateBlock(this->use_key, this->use_key.size());
         this->SystemEntropy.GenerateBlock(this->use_iv, this->use_iv.size());
+        }catch(...){
+            std::cerr << "Error: RevokeKeyId" << std::endl;
+        }
     };
 
     /**
@@ -332,7 +336,9 @@ class Viper
                                      const SHA_BLOCK_SIZE use_sha_mode = SHA_BLOCK_SIZE::SHA256, const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode = CIPHER_ATTACK_ALGO_MODE::DEFAULT,
                                      const unsigned long int crack_speed_ms = 10000) noexcept
     {
-
+        
+    try
+        {
         std::cout << "Nunber of entries to crack: " << cipher_target_list.size() << std::endl;
         this->cipher_crack_entries = cipher_target_list.size();
         if (cipher_target_list.size() > 0)
@@ -391,6 +397,10 @@ class Viper
             }
             std::cout << "Resource Scan Finished!" << std::endl;
             this->is_cracker_running = false;
+        }
+
+        }catch(...){
+            std::cerr << "Error: Hash Cipher Attack Failure!" << std::endl;
         }
         return *this;
     };
@@ -468,7 +478,7 @@ class Viper
         }
         catch (...)
         {
-            std::cout << "Error Cipher Attack Detached Mode" << std::endl;
+            std::cout << "Error: Detached Cipher Attack Failure!" << std::endl;
         }
         return *this;
     };
@@ -480,6 +490,9 @@ class Viper
      */
     void ThreadWait(void) noexcept
     {
+    
+        try
+        {
         std::thread observer([&]() {
             std::this_thread::sleep_for(std::chrono::seconds(6));
             while (this->is_cracker_running)
@@ -498,6 +511,9 @@ class Viper
                 std::cout << this->CrackRegister[i].hash << " = " << this->CrackRegister[i].raw << std::endl;
         }
         std::cout << "\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" << std::endl;
+        }catch(...){
+           std::cerr << "Error: ThreadWait Call" << std::endl;
+        }
     };
 
     ~Viper()
@@ -514,11 +530,15 @@ class Viper
      */
     const void FileCollect(const std::basic_string_view<char> &KeyFileName, const RSA_KEY_FILE Flag) noexcept
     {
+        try
+        {
         FileSink KeyFileSinker(KeyFileName.data());
         if (Flag == ViperCipher::RSA_KEY_FILE::PUBLIC)
             KeyFileSinker.Put(reinterpret_cast<const CryptoPP::byte *>(this->Blocks.public_key_pem.data()), this->Blocks.public_key_pem.size());
         else
             KeyFileSinker.Put(reinterpret_cast<const CryptoPP::byte *>(this->Blocks.private_key_pem.data()), this->Blocks.private_key_pem.size());
+        }catch(...){
+            std::cerr << "Error: FileCollect Call" << std::endl;
     };
 };
 
