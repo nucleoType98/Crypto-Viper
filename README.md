@@ -11,6 +11,8 @@ AES(Advanced-Encryption-Standard) encryption, SHA** Hashing Algorithms, and Hash
 
 > Symmetric Encryption/Decryption using AES/CBC encryption methods, the function requires a single string as argument, it will encrypt that string using AES encryption and return its encrypted version as string_view.
 
+> Warning: You must use the same viper instance when you're encrypting and decrypting a source, becuase Viper instances hold different key and Init Vector Values. So using a Viper1 for encryption and Viper2 for decryption will result in error.
+
 ```cpp
 #include "lib/viper.cpp"
 
@@ -41,9 +43,6 @@ int main(int argc, char **argv)
 > Hash strings, by default the hashing algorithm is SHA256, as standard, it can be set to another value by providing its value  as second argument. The function requires just one argument as target, and an optional algorithm as second argument.
 
 ```cpp
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include "lib/viper.cpp"
 
 using namespace std;
@@ -73,9 +72,6 @@ Available Flags:
 * SHA_BLOCK_SIZE::SHA512          hash using sha512
 
 ```cpp
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include "lib/viper.cpp"
 
 using namespace std;
@@ -108,9 +104,6 @@ int main(int argc, char **argv) {
 > Generate a public key using RSA standard, this will generate a public key for you and store it either within the code or in a local file if specified, by default the key is stored within the code for usage, the key is generated using GenRsaPublicKey() and retrieved using .getPublicKey() either as chain execution block or on a different line providing a collector.
 
 ```cpp
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include "lib/viper.cpp"
 
 using namespace std;
@@ -138,9 +131,6 @@ int main(int argc, char **argv) {
 > Just as the public key generator, but this one generates a Private key, argument list and execution style are the same.
 
 ```cpp
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include "lib/viper.cpp"
 
 using namespace std;
@@ -176,9 +166,6 @@ Available Flags
 * RSA_KEY_FLAG::DEFAULT          -- defaults to SCRIPT_COLLECTOR
 
 ```cpp
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include "lib/viper.cpp"
 
 using namespace std;
@@ -209,9 +196,6 @@ int main(int argc, char **argv) {
 > Revoke the current key/iv used for crypto operations, this makes sure to refresh the key and initialization vector for new operations.
 
 ```cpp
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include "lib/viper.cpp"
 
 using namespace std;
@@ -239,9 +223,6 @@ int main(int argc, char **argv) {
 > You need to specify an algorithm as well for the attack, such as SHA1, SHA256, etc... and finally provide the loop execution speed used to suspand the operation for an X mcs in order to allow proper operation output. 
 
 ```cpp
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include "lib/viper.cpp"
 
 using namespace std;
@@ -292,9 +273,6 @@ int main(int argc, char **argv) {
 > Same as CipherAttack() but uses a detached thread for attacking operations.
 
 ```cpp
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include "lib/viper.cpp"
 
 using namespace std;
