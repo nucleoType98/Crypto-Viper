@@ -4,14 +4,130 @@
 A robust crypto class that performs encryption, decryption, hashing, ssl key management, cipher cracking functions etc...
 Errors and memory management is handled carefully to avoid memory leaks and bugs during runtime and compile-time. It involves advanced concepts such as Rsa public/private key pair generation, 
 AES(Advanced-Encryption-Standard) encryption, SHA** Hashing Algorithms, and Hash Attack Functionalities, it has been tested for memory leaks many times and the result is no memory leak happens, stay cool...
- 
+
+> written on a Linux OS, x86_64 architecture, compiled using g++ compiler and c++20 flag.
+
+# Table of Content
+
+* Usage
+* Namespace
+* Macros
+* Structs
+* Enums
+* Class
+* Methods
+* Properties
+* Pseudo-Code
+
+## Usage
+> Use for encryption, decryption, hashing, ssl rsa key generation operations. Just include the translation unit "viper.cpp" which is in the "include" folder within root directory, you might want to "use namespace ViperCipher" in order to omit the namespace resolution prefix.
+
+## Namespace
+> There is only one namespace available:
+```cpp
+namespace ViperCipher{ ... };
+```
+
+## Macros
+```cpp
+#define __BUFFER_MAX_SIZE__ (unsigned int)4096u
+```
+
+## Structs
+```cpp
+typedef struct alignas(void *) {
+  std::basic_string<char> plain;
+  std::basic_string<char> hashed;
+  std::basic_string<char> encrypted;
+  std::basic_string<char> decrypted;
+  std::basic_string<char> public_key_pem;
+  std::basic_string<char> private_key_pem;
+} BlockStructure;
+
+typedef struct alignas(void *) {
+  std::string raw;
+  std::string hash;
+} CrackedCipherStructure;
+
+typedef struct alignas(void *) {
+  SHA1 s1;
+  SHA224 s224;
+  SHA256 s256;
+  SHA384 s384;
+  SHA512 s512;
+} ShaModeStructure;
+```
+
+## Enums
+```cpp
+enum class RSA_KEY_FLAG : unsigned short int { FILE_COLLECTOR = 0, SCRIPT_COLLECTOR, DEFAULT };
+enum class RSA_KEY_FILE : unsigned short int { PUBLIC = 0, PRIVATE = 1 };
+enum class SHA_BLOCK_SIZE : unsigned short int { SHA1 = 1, SHA224 = 224, SHA256 = 256, SHA384 = 384, SHA512 = 512 };
+enum class CIPHER_ATTACK_ALGO_MODE : unsigned short int { INFER = 0, ENFORCE, SMART, DEFAULT };
+```
+
+## Class
+```cpp
+class Viper{ ... };
+```
+
+## Method  Signature
+> All methods are public, except FileCollect()
+```cpp
+  Viper();
+
+  const std::basic_string_view<char> Hash(const std::string &target, const SHA_BLOCK_SIZE ShaSize) noexcept;
+
+  const std::basic_string_view<char> Encrypt(const std::string &target) noexcept;
+
+  const std::basic_string_view<char> Decrypt(const std::basic_string_view<char> &target) noexcept;
+
+  ViperCipher::Viper &GenRsaPublicKey(const std::basic_string_view<char> &KeyFileName, const ViperCipher::RSA_KEY_FLAG &Flag) noexcept;
+
+  ViperCipher::Viper &GenRsaPrivateKey(const std::basic_string_view<char> &KeyFileName, const ViperCipher::RSA_KEY_FLAG &Flag) noexcept;
+
+  const std::string getPublicKey(void) noexcept;
+
+  const std::string getPrivateKey(void) noexcept;
+
+  void RevokeKeyIv(void) noexcept;
+
+  ViperCipher::Viper &CipherAttack(const std::initializer_list<std::basic_string<char>> &cipher_target_list, const std::basic_string_view<char> &target_file, const SHA_BLOCK_SIZE use_sha_mode, 
+  const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode, const unsigned long int crack_speed_ms) noexcept;
+
+  ViperCipher::Viper &CipherAttackDetached(const std::initializer_list<std::basic_string<char>> &cipher_target_list, const std::basic_string_view<char> &target_file, const SHA_BLOCK_SIZE 
+  use_sha_mode, const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode, const unsigned long int crack_speed_ms) noexcept;
+
+  void ThreadWait(void) noexcept;
+
+  const std::vector<CrackedCipherStructure> get_cracked_block() noexcept;
+
+  const void FileCollect(const std::basic_string_view<char> &KeyFileName, const RSA_KEY_FILE Flag) noexcept;
+
+  ~Viper();
+```
+
+## Properties
+> All properties are private.
+```cpp
+  BlockStructure Blocks;
+  std::vector<CrackedCipherStructure> CrackRegister;
+  AutoSeededRandomPool SystemEntropy;
+  SecByteBlock use_key;
+  SecByteBlock use_iv;
+  ShaModeStructure ShaMode;
+  bool is_cracker_running = false;
+  std::vector<std::string> crack_deck;
+  unsigned short int cipher_crack_entries = 0;
+```
+
 ## Pseudo Code
 
 ### Simple Encryption/Decryption
 
 > Symmetric Encryption/Decryption using AES/CBC encryption methods, the function requires a single string as argument, it will encrypt that string using AES encryption and return its encrypted version as string_view.
 
-> Warning: You must use the same viper instance when you're encrypting and decrypting a source, becuase Viper instances hold different key and Init Vector Values. So using a Viper1 for encryption and Viper2 for decryption will result in error.
+ NOTE: You must use the same viper instance when you're encrypting and decrypting a source, becuase Viper instances hold different key and Init Vector Values. So using a Viper1 for encryption and Viper2 for decryption will result in error.
 
 ```cpp
 #include "lib/viper.cpp"
