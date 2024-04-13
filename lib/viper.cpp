@@ -30,9 +30,12 @@ ViperCipher::Viper::Viper() : Blocks({}) {
  */
 const std::basic_string_view<char> ViperCipher::Viper::Hash(const std::string &target, const ViperCipher::SHA_BLOCK_SIZE ShaSize = ViperCipher::SHA_BLOCK_SIZE::SHA256) noexcept {
   try {
-    this->Blocks.hashed.clear();
+    if (!this->Blocks.hashed.empty())
+      this->Blocks.hashed.clear();
 
-    if (!target.empty() && target.size() > 0) {
+    std::cout << "Ready to Hash: " << target << std::endl;
+
+    if (!target.empty()) {
       if (ShaSize == ViperCipher::SHA_BLOCK_SIZE::SHA1)
         StringSource(target, true, new HashFilter(this->ShaMode.s1, new HexEncoder(new StringSink(this->Blocks.hashed))));
       else if (ShaSize == ViperCipher::SHA_BLOCK_SIZE::SHA224)
@@ -49,6 +52,7 @@ const std::basic_string_view<char> ViperCipher::Viper::Hash(const std::string &t
   } catch (...) {
     std::cerr << "Unkown Error: " << std::endl;
   }
+  std::cout << "Hashed Result: " << this->Blocks.hashed << std::endl;
   return this->Blocks.hashed;
 };
 
@@ -199,7 +203,7 @@ void ViperCipher::Viper::RevokeKeyIv(void) noexcept {
 ViperCipher::Viper &ViperCipher::Viper::CipherAttack(const std::initializer_list<std::basic_string<char>> &cipher_target_list, const std::basic_string_view<char> &target_file, const ViperCipher::SHA_BLOCK_SIZE use_sha_mode = ViperCipher::SHA_BLOCK_SIZE::SHA256, const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode = CIPHER_ATTACK_ALGO_MODE::DEFAULT, const unsigned long int crack_speed_ms = 10000) noexcept {
   try {
 
-    if (cipher_target_list.size() > 0)
+    if (cipher_target_list.size() == 0)
       throw std::underflow_error("Please provide a valid list...");
 
     if (target_file.empty())
@@ -208,66 +212,67 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttack(const std::initializer_list
     std::cout << "Nunber of entries to crack: " << cipher_target_list.size() << std::endl;
     this->cipher_crack_entries = cipher_target_list.size();
 
-      std::vector<std::string> attack_list;
-      std::fstream TableGetEntries(target_file.data());
-      std::string collect;
-      if (TableGetEntries.is_open()) {
-        std::cout << "Aquiring Resources from <" << target_file << ">" << std::endl;
-        while (std::getline(TableGetEntries, collect)) {
-          std::cout << collect << std::flush;
-          attack_list.push_back(collect);
-          std::cout << std::endl;
-        }
+    std::vector<std::string> attack_list;
+    std::fstream TableGetEntries(target_file.data());
+    std::string collect;
+    if (TableGetEntries.is_open()) {
+      std::cout << "Aquiring Resources from <" << target_file << ">" << std::endl;
+      while (std::getline(TableGetEntries, collect)) {
+        std::cout << collect << std::flush;
+        attack_list.push_back(collect);
+        std::cout << std::endl;
       }
+    }
 
-      if(attack_list.empty()) throw std::underflow_error("attack list is empty!");
+    if (attack_list.empty())
+      throw std::underflow_error("attack list is empty!");
 
-      TableGetEntries.close();
+    TableGetEntries.close();
 
-      std::cout << "\nCollected (" << attack_list.size() << ")\n"
-                << "Loading entries, 1 second ..." << std::endl;
+    std::cout << "\nCollected (" << attack_list.size() << ")\n"
+              << "Loading entries, 1 second ..." << std::endl;
 
-      std::this_thread::sleep_for(std::chrono::microseconds(4000000));
+    std::this_thread::sleep_for(std::chrono::microseconds(4000000));
 
-      std::string result = "";
+    std::string result = "";
 
-      std::function<bool()> block_match = [&]() -> bool {
-        bool got_exposed = false;
-        for (auto &x : cipher_target_list)
-          if (result == x)
-            got_exposed = true;
+    std::function<bool()> block_match = [&]() -> bool {
+      bool got_exposed = false;
+      for (auto &x : cipher_target_list)
+        if (result == x)
+          got_exposed = true;
 
-        return got_exposed;
-      };
+      return got_exposed;
+    };
 
-      for (auto &list_target : attack_list) {
-        if (!list_target.empty()) {
-          this->is_cracker_running = true;
-          if (use_sha_mode == ViperCipher::SHA_BLOCK_SIZE::SHA256) {
-            result.clear();
-            StringSource(list_target, true, new HashFilter(this->ShaMode.s256, new HexEncoder(new StringSink(result))));
-            std::cout << result << std::flush << std::endl;
-            if (block_match() == true) {
-              gMutex.try_lock();
-              this->CrackRegister.push_back({list_target, result});
-              gMutex.unlock();
-            }
-            std::this_thread::sleep_for(std::chrono::microseconds(crack_speed_ms));
+    for (auto &list_target : attack_list) {
+      if (!list_target.empty()) {
+        this->is_cracker_running = true;
+        if (use_sha_mode == ViperCipher::SHA_BLOCK_SIZE::SHA256) {
+          result.clear();
+          StringSource(list_target, true, new HashFilter(this->ShaMode.s256, new HexEncoder(new StringSink(result))));
+          std::cout << result << std::flush << std::endl;
+          if (block_match() == true) {
+            gMutex.try_lock();
+            this->CrackRegister.push_back({list_target, result});
+            gMutex.unlock();
           }
+          std::this_thread::sleep_for(std::chrono::microseconds(crack_speed_ms));
         }
       }
-      std::cout << "Resource Scan Finished!" << std::endl;
-      std::cout << "------------------ Print out Result -------------------" << std::endl;
-      std::cout << "- Deciphered Block Size: " << this->DecipherResult.size() << std::endl;
-      if (!this->DecipherResult.empty()) {
-        for(auto &__r: this->DecipherResult) {
-            if(__r.first.empty() || __r.second.empty())
-              continue;
+    }
+    std::cout << "Resource Scan Finished!" << std::endl;
+    std::cout << "------------------ Print out Result -------------------" << std::endl;
+    std::cout << "- Deciphered Block Size: " << this->DecipherResult.size() << std::endl;
+    if (!this->DecipherResult.empty()) {
+      for (auto &__r : this->DecipherResult) {
+        if (__r.first.empty() || __r.second.empty())
+          continue;
 
-            std::cout << "Decipher Key = " << __r.first << "\t\t\t Value = " << __r.second << std::endl;
-        }
+        std::cout << "Decipher Key = " << __r.first << "\t\t\t Value = " << __r.second << std::endl;
       }
-      this->is_cracker_running = false;
+    }
+    this->is_cracker_running = false;
 
   } catch (const std::underflow_error &__e) {
     std::cerr << "Error: Underflow Error => " << __e.what() << std::endl;
@@ -414,7 +419,7 @@ ViperCipher::Viper::~Viper() {
       }
 
       if (!this->DecipherResult.empty()) {
-        for (auto &__d: this->DecipherResult) {
+        for (auto &__d : this->DecipherResult) {
           if (!__d.first.empty() && !__d.second.empty()) {
             this->DecipherResult[__d.first] = "";
           }
