@@ -2,6 +2,8 @@
 # C++ Crypto Viper
 
 A robust crypto class that performs encryption, decryption, hashing, ssl key management, cipher cracking functions etc...
+Errors and memory management is handled carefully to avoid memory leaks and bugs during runtime and compile-time. It involves advanced concepts such as Rsa public/private key pair generation, 
+AES/DES encryption methods, SHA** Hashing Algorithms, and Hash Attack Functionalities, it has been tested for memory leaks many times and the result is no memory leak happens, stay cool...
  
 ## Code Semantics
 
@@ -358,6 +360,10 @@ You need to create an instance of the "Viper" class to utilize these functionali
 
 ## Dependencies
 * Dependencies include Crypto++ and standard C++ libraries.
+
+> If you don't have crypto++ installed on your system, assuming you are on debian, ubuntu etc... run the following command within a console to install crypto++ so you can use it...
+
+$ sudo apt install libcrypto++-dev
 
 ## Memory Safety
 * Tested for memory safety using g++ address-sanitizer flag, with no reported memory leaks.
