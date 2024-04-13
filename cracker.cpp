@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib/viper.hpp"
+#include "lib/viper.cpp"
 
 using namespace std;
 using namespace ViperCipher;
@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     string  sha256_cipher_target4 = "921A320AA9782C475560FF5136A8CC0B25F3ADF0DE751D918C9D78B105D2E368";  // <-- hashed "conspire" with 256 bit block size
     string  sha256_cipher_target5 = "D90EE9CCF6BEA1D2942A7B21319338198DEC2A746F8A0D0771621F00DA2E0864";  // <-- hashed "drop" with 256 bit block size
 
-    const uint64_t operation_speed = 1000UL;                                                             // <-- loop execution speed in microseconds format,  1 second = 1000000 microseconds
+    const uint64_t operation_speed = 500UL;                                                             // <-- loop execution speed in microseconds format,  1 second = 1000000 microseconds
 
     /**
       * ----------- PARAMETER LIST ------------
@@ -38,6 +38,8 @@ int main(int argc, char **argv) {
                          ViperCipher::SHA_BLOCK_SIZE::SHA256,
                          CIPHER_ATTACK_ALGO_MODE::DEFAULT,
                          operation_speed );
+
+    viper->ThreadWait();
 
     delete viper;
     return 0;

@@ -71,15 +71,15 @@ class Viper {
 private:
   BlockStructure Blocks;
   std::vector<CrackedCipherStructure> CrackRegister;
-
+  std::unordered_map<std::string_view, std::string_view> DecipherResult;
   AutoSeededRandomPool SystemEntropy;
-
   SecByteBlock use_key;
   SecByteBlock use_iv;
   ShaModeStructure ShaMode;
   bool is_cracker_running = false;
   std::vector<std::string> crack_deck;
   unsigned short int cipher_crack_entries = 0;
+
 
   const void FileCollect(const std::basic_string_view<char> &KeyFileName, const RSA_KEY_FILE Flag) noexcept;
 

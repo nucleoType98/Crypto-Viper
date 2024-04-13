@@ -9,6 +9,18 @@ ViperCipher::Viper::Viper() : Blocks({}) {
   this->use_iv.resize(AES::BLOCKSIZE);
   this->SystemEntropy.GenerateBlock(this->use_key, this->use_key.size());
   this->SystemEntropy.GenerateBlock(this->use_iv, this->use_iv.size());
+  this->Blocks = {};
+  this->Blocks.decrypted = "";
+  this->Blocks.encrypted = "";
+  this->Blocks.hashed = "";
+  this->Blocks.plain = "";
+  this->Blocks.private_key_pem = "";
+  this->Blocks.public_key_pem = "";
+  this->cipher_crack_entries = 0;
+  this->crack_deck = {};
+  this->CrackRegister = {};
+  this->DecipherResult = {};
+  this->is_cracker_running = false;
 };
 
 /**
@@ -47,7 +59,9 @@ const std::basic_string_view<char> ViperCipher::Viper::Hash(const std::string &t
  */
 const std::basic_string_view<char> ViperCipher::Viper::Encrypt(const std::string &target) noexcept {
   try {
-    this->Blocks.encrypted.clear();
+    if (!this->Blocks.encrypted.empty())
+      this->Blocks.encrypted.clear();
+
     if (target.empty() == false && target.size() > 0) {
       AES::Encryption AesEncryption;
       CBC_Mode<AES>::Encryption CbcEncryption;
@@ -59,7 +73,7 @@ const std::basic_string_view<char> ViperCipher::Viper::Encrypt(const std::string
   } catch (...) {
     std::cerr << "Unkown Error: " << std::endl;
   }
-  return this->Blocks.encrypted.c_str();
+  return !this->Blocks.encrypted.empty() ? this->Blocks.encrypted.c_str() : "";
 };
 
 /**
@@ -69,8 +83,10 @@ const std::basic_string_view<char> ViperCipher::Viper::Encrypt(const std::string
  */
 const std::basic_string_view<char> ViperCipher::Viper::Decrypt(const std::basic_string_view<char> &target) noexcept {
   try {
-    this->Blocks.decrypted.clear();
-    if (target.empty() == false && target.size() > 0) {
+    if (!this->Blocks.decrypted.empty())
+      this->Blocks.decrypted.clear();
+
+    if (!target.empty()) {
       AES::Decryption Decryption;
       CBC_Mode<AES>::Decryption CbcDecryption;
 
@@ -82,7 +98,7 @@ const std::basic_string_view<char> ViperCipher::Viper::Decrypt(const std::basic_
   } catch (...) {
     std::cerr << "Unknown Error" << std::endl;
   }
-  return this->Blocks.decrypted;
+  return !this->Blocks.decrypted.empty() ? this->Blocks.decrypted.c_str() : "";
 };
 
 /**
@@ -93,7 +109,8 @@ const std::basic_string_view<char> ViperCipher::Viper::Decrypt(const std::basic_
  */
 ViperCipher::Viper &ViperCipher::Viper::GenRsaPublicKey(const std::basic_string_view<char> &KeyFileName = "", const ViperCipher::RSA_KEY_FLAG &Flag = ViperCipher::RSA_KEY_FLAG::SCRIPT_COLLECTOR) noexcept {
   try {
-    this->Blocks.public_key_pem.clear();
+    if (!this->Blocks.public_key_pem.empty())
+      this->Blocks.public_key_pem.clear();
 
     const unsigned short int BLOCK_SIZE = 2048u;
     memset((void *)&this->Blocks.public_key_pem, 0, sizeof(std::string));
@@ -105,7 +122,7 @@ ViperCipher::Viper &ViperCipher::Viper::GenRsaPublicKey(const std::basic_string_
 
     publicKey.Save(Base64Encoder(new StringSink(this->Blocks.public_key_pem)).Ref());
 
-    if (KeyFileName.empty() == false && KeyFileName.length() > 0) {
+    if (!KeyFileName.empty()) {
       if (static_cast<int>(Flag) == static_cast<int>(RSA_KEY_FLAG::DEFAULT) || static_cast<int>(Flag) == static_cast<int>(RSA_KEY_FLAG::FILE_COLLECTOR)) {
         this->FileCollect(KeyFileName, RSA_KEY_FILE::PUBLIC);
       }
@@ -138,7 +155,7 @@ ViperCipher::Viper &ViperCipher::Viper::GenRsaPrivateKey(const std::basic_string
 
     privateKey.Save(Base64Encoder(new StringSink(this->Blocks.private_key_pem)).Ref());
 
-    if (KeyFileName.empty() == false && KeyFileName.length() > 0) {
+    if (!KeyFileName.empty()) {
       if (static_cast<int>(Flag) == static_cast<int>(RSA_KEY_FLAG::DEFAULT) || static_cast<int>(Flag) == static_cast<int>(RSA_KEY_FLAG::FILE_COLLECTOR)) {
         this->FileCollect(KeyFileName, RSA_KEY_FILE::PRIVATE);
       }
@@ -151,9 +168,9 @@ ViperCipher::Viper &ViperCipher::Viper::GenRsaPrivateKey(const std::basic_string
   return *this;
 };
 
-const std::string ViperCipher::Viper::getPublicKey(void) noexcept { return this->Blocks.public_key_pem; };
+const std::string ViperCipher::Viper::getPublicKey(void) noexcept { return this->Blocks.public_key_pem.empty() ? "" : this->Blocks.public_key_pem; };
 
-const std::string ViperCipher::Viper::getPrivateKey(void) noexcept { return this->Blocks.private_key_pem; };
+const std::string ViperCipher::Viper::getPrivateKey(void) noexcept { return this->Blocks.private_key_pem.empty() ? "" : this->Blocks.private_key_pem; };
 
 /**
  * Revoke the Key/Initialization Vector Blocks
@@ -180,11 +197,17 @@ void ViperCipher::Viper::RevokeKeyIv(void) noexcept {
  * @returns void
  */
 ViperCipher::Viper &ViperCipher::Viper::CipherAttack(const std::initializer_list<std::basic_string<char>> &cipher_target_list, const std::basic_string_view<char> &target_file, const ViperCipher::SHA_BLOCK_SIZE use_sha_mode = ViperCipher::SHA_BLOCK_SIZE::SHA256, const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode = CIPHER_ATTACK_ALGO_MODE::DEFAULT, const unsigned long int crack_speed_ms = 10000) noexcept {
-
   try {
+
+    if (cipher_target_list.size() > 0)
+      throw std::underflow_error("Please provide a valid list...");
+
+    if (target_file.empty())
+      throw std::underflow_error("Please provide a valid target file name...");
+
     std::cout << "Nunber of entries to crack: " << cipher_target_list.size() << std::endl;
     this->cipher_crack_entries = cipher_target_list.size();
-    if (cipher_target_list.size() > 0) {
+
       std::vector<std::string> attack_list;
       std::fstream TableGetEntries(target_file.data());
       std::string collect;
@@ -196,6 +219,8 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttack(const std::initializer_list
           std::cout << std::endl;
         }
       }
+
+      if(attack_list.empty()) throw std::underflow_error("attack list is empty!");
 
       TableGetEntries.close();
 
@@ -216,7 +241,7 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttack(const std::initializer_list
       };
 
       for (auto &list_target : attack_list) {
-        if (list_target.empty() == false && list_target.length() > 0) {
+        if (!list_target.empty()) {
           this->is_cracker_running = true;
           if (use_sha_mode == ViperCipher::SHA_BLOCK_SIZE::SHA256) {
             result.clear();
@@ -232,9 +257,20 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttack(const std::initializer_list
         }
       }
       std::cout << "Resource Scan Finished!" << std::endl;
-      this->is_cracker_running = false;
-    }
+      std::cout << "------------------ Print out Result -------------------" << std::endl;
+      std::cout << "- Deciphered Block Size: " << this->DecipherResult.size() << std::endl;
+      if (!this->DecipherResult.empty()) {
+        for(auto &__r: this->DecipherResult) {
+            if(__r.first.empty() || __r.second.empty())
+              continue;
 
+            std::cout << "Decipher Key = " << __r.first << "\t\t\t Value = " << __r.second << std::endl;
+        }
+      }
+      this->is_cracker_running = false;
+
+  } catch (const std::underflow_error &__e) {
+    std::cerr << "Error: Underflow Error => " << __e.what() << std::endl;
   } catch (...) {
     std::cerr << "Error: Hash Cipher Attack Failure!" << std::endl;
   }
@@ -293,7 +329,7 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttackDetached(const std::initiali
             }
           }
         }
-        std::cout << "Resource Scan Finished!" << std::endl;
+        std::cout << "Scan Finished!" << std::endl;
         this->is_cracker_running = false;
       }
     };
@@ -355,28 +391,37 @@ ViperCipher::Viper::~Viper() {
     this->Blocks.public_key_pem.clear();
 
   this->cipher_crack_entries = 0;
-  if(this->crack_deck.size() > 0){
-    try{
-    for (size_t __c = 0; __c < this->crack_deck.size(); ++__c){
-        if(!this->crack_deck[__c].empty()) {
+  if (!this->crack_deck.empty()) {
+    try {
+      for (size_t __c = 0; __c < this->crack_deck.size(); ++__c) {
+        if (!this->crack_deck[__c].empty()) {
           this->crack_deck[__c].clear();
-          memset((void*)this->crack_deck[__c].data(), 0, sizeof(std::string));
-        }
-    }
-    this->crack_deck.clear();
-    this->crack_deck.~vector();
-
-    if(this->CrackRegister.size() > 0){
-      for (size_t __c = 0; __c < this->CrackRegister.size(); ++__c){
-        if(!this->CrackRegister[__c].hash.empty()){
-          this->CrackRegister[__c].hash.clear();
-        }
-        if(!this->CrackRegister[__c].raw.empty()){
-          this->CrackRegister[__c].raw.clear();
+          memset((void *)this->crack_deck[__c].data(), 0, sizeof(std::string));
         }
       }
-    }
-    
+      this->crack_deck.clear();
+
+      if (!this->CrackRegister.empty()) {
+        for (size_t __c = 0; __c < this->CrackRegister.size(); ++__c) {
+          if (!this->CrackRegister[__c].hash.empty()) {
+            this->CrackRegister[__c].hash.clear();
+          }
+          if (!this->CrackRegister[__c].raw.empty()) {
+            this->CrackRegister[__c].raw.clear();
+          }
+        }
+        this->CrackRegister.clear();
+      }
+
+      if (!this->DecipherResult.empty()) {
+        for (auto &__d: this->DecipherResult) {
+          if (!__d.first.empty() && !__d.second.empty()) {
+            this->DecipherResult[__d.first] = "";
+          }
+        }
+        this->DecipherResult.clear();
+      }
+
     } catch (...) {
       std::cerr << "Some Error Occured while cleaning up memory..." << std::endl;
     }
