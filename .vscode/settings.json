@@ -20,7 +20,7 @@
      "editor.minimap.maxColumn":310,
      "editor.minimap.scale": 3,
      "editor.minimap.size": "proportional",
-     "editor.fontSize": 20,
+     "editor.fontSize": 25,
      "editor.fontFamily": "Terminus (TTF)",
      "scm.diffDecorations": "minimap",
      "editor.tabSize": 4,

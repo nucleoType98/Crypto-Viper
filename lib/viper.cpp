@@ -19,7 +19,6 @@ ViperCipher::Viper::Viper() : Blocks({}) {
   this->cipher_crack_entries = 0;
   this->crack_deck = {};
   this->CrackRegister = {};
-  this->DecipherResult = {};
   this->is_cracker_running = false;
 };
 
@@ -32,8 +31,6 @@ const std::basic_string_view<char> ViperCipher::Viper::Hash(const std::string &t
   try {
     if (!this->Blocks.hashed.empty())
       this->Blocks.hashed.clear();
-
-    std::cout << "Ready to Hash: " << target << std::endl;
 
     if (!target.empty()) {
       if (ShaSize == ViperCipher::SHA_BLOCK_SIZE::SHA1)
@@ -52,8 +49,9 @@ const std::basic_string_view<char> ViperCipher::Viper::Hash(const std::string &t
   } catch (...) {
     std::cerr << "Unkown Error: " << std::endl;
   }
-  std::cout << "Hashed Result: " << this->Blocks.hashed << std::endl;
-  return this->Blocks.hashed;
+//  std::cout << "Hashed Result: " << this->Blocks.hashed << std::endl;
+  std::string_view __r = this->Blocks.hashed.c_str();
+  return __r.empty() ? "" : __r;
 };
 
 /**
@@ -209,14 +207,12 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttack(const std::initializer_list
     if (target_file.empty())
       throw std::underflow_error("Please provide a valid target file name...");
 
-    std::cout << "Nunber of entries to crack: " << cipher_target_list.size() << std::endl;
     this->cipher_crack_entries = cipher_target_list.size();
 
     std::vector<std::string> attack_list;
     std::fstream TableGetEntries(target_file.data());
     std::string collect;
     if (TableGetEntries.is_open()) {
-      std::cout << "Aquiring Resources from <" << target_file << ">" << std::endl;
       while (std::getline(TableGetEntries, collect)) {
         std::cout << collect << std::flush;
         attack_list.push_back(collect);
@@ -228,9 +224,6 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttack(const std::initializer_list
       throw std::underflow_error("attack list is empty!");
 
     TableGetEntries.close();
-
-    std::cout << "\nCollected (" << attack_list.size() << ")\n"
-              << "Loading entries, 1 second ..." << std::endl;
 
     std::this_thread::sleep_for(std::chrono::microseconds(4000000));
 
@@ -261,17 +254,7 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttack(const std::initializer_list
         }
       }
     }
-    std::cout << "Resource Scan Finished!" << std::endl;
-    std::cout << "------------------ Print out Result -------------------" << std::endl;
-    std::cout << "- Deciphered Block Size: " << this->DecipherResult.size() << std::endl;
-    if (!this->DecipherResult.empty()) {
-      for (auto &__r : this->DecipherResult) {
-        if (__r.first.empty() || __r.second.empty())
-          continue;
 
-        std::cout << "Decipher Key = " << __r.first << "\t\t\t Value = " << __r.second << std::endl;
-      }
-    }
     this->is_cracker_running = false;
 
   } catch (const std::underflow_error &__e) {
@@ -285,14 +268,12 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttack(const std::initializer_list
 ViperCipher::Viper &ViperCipher::Viper::CipherAttackDetached(const std::initializer_list<std::basic_string<char>> &cipher_target_list, const std::basic_string_view<char> &target_file, const ViperCipher::SHA_BLOCK_SIZE use_sha_mode = ViperCipher::SHA_BLOCK_SIZE::SHA256, const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode = CIPHER_ATTACK_ALGO_MODE::DEFAULT, const unsigned long int crack_speed_ms = 10000) noexcept {
   try {
     std::function<void()> cb = [cipher_target_list = std::vector<std::basic_string<char>>(cipher_target_list.begin(), cipher_target_list.end()), target_file, use_sha_mode, algo_cipher_mode, crack_speed_ms, this]() -> void {
-      std::cout << "Nunber of entries to crack: " << cipher_target_list.size() << std::endl;
       this->cipher_crack_entries = cipher_target_list.size();
       if (cipher_target_list.size() > 0) {
         std::vector<std::string> attack_list;
         std::fstream TableGetEntries(target_file.data());
         std::string collect;
         if (TableGetEntries.is_open()) {
-          std::cout << "Aquiring Resources from <" << target_file << ">" << std::endl;
           while (std::getline(TableGetEntries, collect)) {
             std::cout << collect << std::flush;
             attack_list.push_back(collect);
@@ -301,9 +282,6 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttackDetached(const std::initiali
         }
 
         TableGetEntries.close();
-
-        std::cout << "\nCollected (" << attack_list.size() << ")\n"
-                  << "Loading entries, 1 second ..." << std::endl;
 
         std::this_thread::sleep_for(std::chrono::microseconds(4000000));
 
@@ -324,7 +302,6 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttackDetached(const std::initiali
             if (use_sha_mode == ViperCipher::SHA_BLOCK_SIZE::SHA256) {
               result.clear();
               StringSource(list_target, true, new HashFilter(this->ShaMode.s256, new HexEncoder(new StringSink(result))));
-              std::cout << result << std::flush << std::endl;
               if (block_match() == true) {
                 gMutex.try_lock();
                 this->CrackRegister.push_back({list_target, result});
@@ -334,7 +311,6 @@ ViperCipher::Viper &ViperCipher::Viper::CipherAttackDetached(const std::initiali
             }
           }
         }
-        std::cout << "Scan Finished!" << std::endl;
         this->is_cracker_running = false;
       }
     };
@@ -364,13 +340,6 @@ void ViperCipher::Viper::ThreadWait(void) noexcept {
     if (observer.joinable())
       observer.join();
 
-    std::cout << "Reversed " << this->CrackRegister.size() << "/" << this->cipher_crack_entries << " cipher blocks!" << std::endl;
-    std::cout << "\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" << std::endl;
-    if (this->CrackRegister.size() > 0) {
-      for (unsigned short int i = 0; i < this->CrackRegister.size(); ++i)
-        std::cout << this->CrackRegister[i].hash << " = " << this->CrackRegister[i].raw << std::endl;
-    }
-    std::cout << "\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" << std::endl;
   } catch (...) {
     std::cerr << "Error: ThreadWait Call" << std::endl;
   }
@@ -418,15 +387,6 @@ ViperCipher::Viper::~Viper() {
         this->CrackRegister.clear();
       }
 
-      if (!this->DecipherResult.empty()) {
-        for (auto &__d : this->DecipherResult) {
-          if (!__d.first.empty() && !__d.second.empty()) {
-            this->DecipherResult[__d.first] = "";
-          }
-        }
-        this->DecipherResult.clear();
-      }
-
     } catch (...) {
       std::cerr << "Some Error Occured while cleaning up memory..." << std::endl;
     }
@@ -448,6 +408,13 @@ const void ViperCipher::Viper::FileCollect(const std::basic_string_view<char> &K
   } catch (...) {
     std::cerr << "Error: FileCollect Call" << std::endl;
   };
+};
+
+const std::vector<ViperCipher::CrackedCipherStructure> ViperCipher::Viper::get_cracked_block() noexcept {
+    if(!this->CrackRegister.empty()){
+      return std::as_const(this->CrackRegister);
+    }
+    return std::vector<ViperCipher::CrackedCipherStructure>{};
 };
 
 #endif

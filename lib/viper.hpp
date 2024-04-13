@@ -71,7 +71,6 @@ class Viper {
 private:
   BlockStructure Blocks;
   std::vector<CrackedCipherStructure> CrackRegister;
-  std::unordered_map<std::string_view, std::string_view> DecipherResult;
   AutoSeededRandomPool SystemEntropy;
   SecByteBlock use_key;
   SecByteBlock use_iv;
@@ -110,6 +109,8 @@ public:
   ViperCipher::Viper &CipherAttackDetached(const std::initializer_list<std::basic_string<char>> &cipher_target_list, const std::basic_string_view<char> &target_file, const SHA_BLOCK_SIZE use_sha_mode, const CIPHER_ATTACK_ALGO_MODE algo_cipher_mode, const unsigned long int crack_speed_ms) noexcept;
 
   void ThreadWait(void) noexcept;
+
+  const std::vector<CrackedCipherStructure> get_cracked_block() noexcept;
 
   ~Viper();
 };

@@ -39,7 +39,16 @@ int main(int argc, char **argv) {
                          CIPHER_ATTACK_ALGO_MODE::DEFAULT,
                          operation_speed );
 
-    viper->ThreadWait();
+    auto collector = viper->get_cracked_block();
+
+    if(collector.size() > 0){
+      std::cout << "\n--------------------- Crack Dump -----------------------\n" << std::endl;
+      for (auto &__f : collector) {
+        std::cout << __f.hash << " = " << __f.raw << std::endl;
+      }
+    }else{
+      std::cout << "Did not find any cracked ciphers..." << std::endl;
+    }
 
     delete viper;
     return 0;
