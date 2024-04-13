@@ -1,7 +1,7 @@
 
 # C++ Crypto Viper
 
-A simple light-weight crypto library written in c++ for c++.
+A robust crypto class that performs encryption, decryption, hashing, ssl key management, cipher cracking functions etc...
  
 ## Code Semantics
 
@@ -349,7 +349,7 @@ You need to create an instance of the "Viper" class to utilize these functionali
 
 ## Compatibility
 
-* Developed and tested on Linux Mint OS, with potential compatibility issues on other platforms like Windows and macOS due to dependencies.
+* Developed and tested on Linux x86_64 OS.
 
 ## Compiler
 * Developed using g++20 compiler.
