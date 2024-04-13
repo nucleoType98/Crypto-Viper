@@ -3,13 +3,13 @@
 
 A robust crypto class that performs encryption, decryption, hashing, ssl key management, cipher cracking functions etc...
 Errors and memory management is handled carefully to avoid memory leaks and bugs during runtime and compile-time. It involves advanced concepts such as Rsa public/private key pair generation, 
-AES/DES encryption methods, SHA** Hashing Algorithms, and Hash Attack Functionalities, it has been tested for memory leaks many times and the result is no memory leak happens, stay cool...
+AES(Advanced-Encryption-Standard) encryption, SHA** Hashing Algorithms, and Hash Attack Functionalities, it has been tested for memory leaks many times and the result is no memory leak happens, stay cool...
  
-## Code Semantics
+## Pseudo Code
 
 ### Simple Encryption/Decryption
 
-> Symmetric Encryption/Decryption using AES/CBC encryption.
+> Symmetric Encryption/Decryption using AES/CBC encryption methods, the function requires a single string as argument, it will encrypt that string using AES encryption and return its encrypted version as string_view.
 
 ```cpp
 #include "lib/viper.hpp"
@@ -20,7 +20,7 @@ using namespace ViperCipher;
 int main(int argc, char **argv)
 {
 
-    string  plain = "something to hash";
+    string  plain = "something to encrypt";
 
     Viper *viper = new Viper();
 
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 
 ### Hash
 
-> Hash a string using SHA-256(DEFAULT) Algorithm.
+> Hash strings, by default the hashing algorithm is SHA256, as standard, it can be set to another value by providing its value  as second argument. The function requires just one argument as target, and an optional algorithm as second argument.
 
 ```cpp
 #include <iostream>
@@ -66,11 +66,11 @@ int main(int argc, char **argv) {
 
 Available Flags:
 
-* SHA_BLOCK_SIZE::SHA1
-* SHA_BLOCK_SIZE::SHA224
-* SHA_BLOCK_SIZE::SHA256
-* SHA_BLOCK_SIZE::SHA384
-* SHA_BLOCK_SIZE::SHA512
+* SHA_BLOCK_SIZE::SHA1            hash using sha1
+* SHA_BLOCK_SIZE::SHA224          hash using sha224
+* SHA_BLOCK_SIZE::SHA256          hash using sha256
+* SHA_BLOCK_SIZE::SHA384          hash using sha384
+* SHA_BLOCK_SIZE::SHA512          hash using sha512
 
 ```cpp
 #include <iostream>
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
 
 ### Gen RSA Public Key
 
-> Generate a public key using RSA standard, 
+> Generate a public key using RSA standard, this will generate a public key for you and store it either within the code or in a local file if specified, by default the key is stored within the code for usage, the key is generated using GenRsaPublicKey() and retrieved using .getPublicKey() either as chain execution block or on a different line providing a collector.
 
 ```cpp
 #include <iostream>
@@ -135,6 +135,7 @@ int main(int argc, char **argv) {
 ```
 
 ### Gen RSA Private Key
+> Just as the public key generator, but this one generates a Private key, argument list and execution style are the same.
 
 ```cpp
 #include <iostream>
@@ -164,9 +165,9 @@ int main(int argc, char **argv) {
 
 ```
 
-### Gen RSA Private/Public Key and Store *_r* into appropriate File/s
+### Gen RSA Private/Public Key and Store into appropriate File/s
 
-> Provide a path for the file to store key into as first argument, as second argument a Flag describing the destination store type, The default behavior(RSA_KEY_FLAG::SCRIPT_COLLECTOR) is to store the key locally within the code, to store a key within a file RSA_KEY_FLAG::FILE_COLLECTOR Flag is required
+> Provide a path for the file to store key into as first argument, as second argument a Flag describing the operation mode, if save the key/s to a file/s or not, The default behavior(RSA_KEY_FLAG::SCRIPT_COLLECTOR) is to store the key locally within the code, to store a key within a file then just set RSA_KEY_FLAG::FILE_COLLECTOR as 2nd argument.
 
 Available Flags
 
@@ -205,7 +206,7 @@ int main(int argc, char **argv) {
 
 ### Revoke Key/IV
 
-> Revoke the current key/iv used for crypto operations.
+> Revoke the current key/iv used for crypto operations, this makes sure to refresh the key and initialization vector for new operations.
 
 ```cpp
 #include <iostream>
