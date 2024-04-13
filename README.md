@@ -12,7 +12,7 @@ AES(Advanced-Encryption-Standard) encryption, SHA** Hashing Algorithms, and Hash
 > Symmetric Encryption/Decryption using AES/CBC encryption methods, the function requires a single string as argument, it will encrypt that string using AES encryption and return its encrypted version as string_view.
 
 ```cpp
-#include "lib/viper.hpp"
+#include "lib/viper.cpp"
 
 using namespace std;
 using namespace ViperCipher;
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib/viper.hpp"
+#include "lib/viper.cpp"
 
 using namespace std;
 using namespace ViperCipher;
@@ -76,7 +76,7 @@ Available Flags:
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib/viper.hpp"
+#include "lib/viper.cpp"
 
 using namespace std;
 using namespace ViperCipher;
@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib/viper.hpp"
+#include "lib/viper.cpp"
 
 using namespace std;
 using namespace ViperCipher;
@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib/viper.hpp"
+#include "lib/viper.cpp"
 
 using namespace std;
 using namespace ViperCipher;
@@ -179,7 +179,7 @@ Available Flags
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib/viper.hpp"
+#include "lib/viper.cpp"
 
 using namespace std;
 using namespace ViperCipher;
@@ -212,7 +212,7 @@ int main(int argc, char **argv) {
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib/viper.hpp"
+#include "lib/viper.cpp"
 
 using namespace std;
 using namespace ViperCipher;
@@ -242,7 +242,7 @@ int main(int argc, char **argv) {
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib/viper.hpp"
+#include "lib/viper.cpp"
 
 using namespace std;
 using namespace ViperCipher;
@@ -295,7 +295,7 @@ int main(int argc, char **argv) {
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib/viper.hpp"
+#include "lib/viper.cpp"
 
 using namespace std;
 using namespace ViperCipher;
